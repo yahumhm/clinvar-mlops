@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClinVar MLOps - Predictor Genético</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 750px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h1 { color: #1a365d; margin-top: 0; font-size: 24px; }
+        p.subtitle { color: #555; margin-bottom: 20px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px; color: #2d3748; }
+        input, select { width: 100%; padding: 9px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        .presets { margin-bottom: 20px; display: flex; gap: 10px; }
+        .btn-preset { background: #edf2f7; border: 1px solid #cbd5e0; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #2b6cb0; }
+        .btn-preset:hover { background: #e2e8f0; }
+        .btn-submit { width: 100%; margin-top: 20px; padding: 12px; background: #2b6cb0; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background: #2c5282; }
+        .result { margin-top: 20px; padding: 18px; border-radius: 8px; display: none; }
+        .res-0 { background: #e6fffa; border-left: 5px solid #319795; color: #234e52; }
+        .res-1 { background: #fff5f5; border-left: 5px solid #e53e3e; color: #742a2a; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🧬 ClinVar MLOps: Clasificador de Variantes Genéticas</h1>
+    <p class="subtitle">Ingresa los biomarcadores de secuenciación (Ensembl VEP / CADD / AF) para predecir la clasificación clínica mediante el modelo en producción.</p>
+
+    <div class="presets">
+        <button type="button" class="btn-preset" onclick="loadPreset('conflict')">⚡ Cargar Ejemplo: Variante Sospechosa / Conflictiva</button>
+        <button type="button" class="btn-preset" onclick="loadPreset('benign')">✅ Cargar Ejemplo: Variante Común / Consistente</button>
+    </div>
+
+    <form id="predForm">
+        <div class="grid">
+            <div>
+                <label>Cromosoma (CHROM)</label>
+                <select id="CHROM">
+                    <option value="1">Cromosoma 1</option>
+                    <option value="2">Cromosoma 2</option>
+                    <option value="7">Cromosoma 7</option>
+                    <option value="13">Cromosoma 13 (BRCA2)</option>
+                    <option value="17">Cromosoma 17 (BRCA1/TP53)</option>
+                    <option value="X">Cromosoma X</option>
+                </select>
+            </div>
+            <div>
+                <label>Impacto Molecular (IMPACT)</label>
+                <select id="IMPACT">
+                    <option value="MODERATE">MODERATE (Missense)</option>
+                    <option value="HIGH">HIGH (Stop gained / Frameshift)</option>
+                    <option value="LOW">LOW (Synonymous)</option>
+                    <option value="MODIFIER">MODIFIER (Non-coding)</option>
+                </select>
+            </div>
+            <div>
+                <label>Frecuencia Alélica ESP (AF_ESP)</label>
+                <input type="number" step="any" id="AF_ESP" value="0.0045" required>
+            </div>
+            <div>
+                <label>Frecuencia Alélica ExAC (AF_EXAC)</label>
+                <input type="number" step="any" id="AF_EXAC" value="0.0038" required>
+            </div>
+            <div>
+                <label>Frecuencia Alélica 1000G (AF_TGP)</label>
+                <input type="number" step="any" id="AF_TGP" value="0.0051" required>
+            </div>
+            <div>
+                <label>Puntaje de Daño CADD (CADD_PHRED)</label>
+                <input type="number" step="any" id="CADD_PHRED" value="25.4" required>
+            </div>
+            <div>
+                <label>CADD Crudo (CADD_RAW)</label>
+                <input type="number" step="any" id="CADD_RAW" value="3.65" required>
+            </div>
+            <div>
+                <label>Tolerancia Genética (LoFtool)</label>
+                <input type="number" step="any" id="LoFtool" value="0.042" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Ejecutar Predicción en FastAPI</button>
+    </form>
+
+    <div id="resultBox" class="result"></div>
+</div>
+
+<script>
+function loadPreset(type) {
+    if (type === 'conflict') {
+        document.getElementById('CHROM').value = '17';
+        document.getElementById('IMPACT').value = 'MODERATE';
+        document.getElementById('AF_ESP').value = 0.0085;
+        document.getElementById('AF_EXAC').value = 0.0072;
+        document.getElementById('AF_TGP').value = 0.0091;
+        document.getElementById('CADD_PHRED').value = 26.8;
+        document.getElementById('CADD_RAW').value = 3.89;
+        document.getElementById('LoFtool').value = 0.021;
+    } else {
+        document.getElementById('CHROM').value = '1';
+        document.getElementById('IMPACT').value = 'LOW';
+        document.getElementById('AF_ESP').value = 0.3450;
+        document.getElementById('AF_EXAC').value = 0.3510;
+        document.getElementById('AF_TGP').value = 0.3390;
+        document.getElementById('CADD_PHRED').value = 2.15;
+        document.getElementById('CADD_RAW').value = -0.45;
+        document.getElementById('LoFtool').value = 0.850;
+    }
+}
+
+document.getElementById('predForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+        CHROM: document.getElementById('CHROM').value,
+        IMPACT: document.getElementById('IMPACT').value,
+        AF_ESP: parseFloat(document.getElementById('AF_ESP').value),
+        AF_EXAC: parseFloat(document.getElementById('AF_EXAC').value),
+        AF_TGP: parseFloat(document.getElementById('AF_TGP').value),
+        CADD_PHRED: parseFloat(document.getElementById('CADD_PHRED').value),
+        CADD_RAW: parseFloat(document.getElementById('CADD_RAW').value),
+        LoFtool: parseFloat(document.getElementById('LoFtool').value)
+    };
+
+    const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    const box = document.getElementById('resultBox');
+    box.style.display = 'block';
+    box.className = 'result ' + (data.prediction === 1 ? 'res-1' : 'res-0');
+    box.innerHTML = `<strong>Resultado:</strong> ${data.label}<br>
+                     <strong>Probabilidad estimada por el modelo:</strong> ${data.probability_conflict}%`;
+});
+</script>
+</body>
+</html>
