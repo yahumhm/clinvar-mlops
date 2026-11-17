@@ -1,0 +1,5 @@
+outs:
+- md5: decb1dc9f3d0d874af2d844423991da6
+  size: 30723812
+  hash: md5
+  path: clinvar_raw.csv

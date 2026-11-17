@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+dvc
+mlflow
+fastapi
+uvicorn
+jinja2
+python-multipart
+pytest
