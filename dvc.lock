@@ -1,0 +1,26 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/raw/clinvar_raw.csv
+      hash: md5
+      md5: decb1dc9f3d0d874af2d844423991da6
+      size: 30723812
+    - path: src/preprocess.py
+      hash: md5
+      md5: 05905cb54422c2a8660333b6bb11cc24
+      size: 2250
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 7ca0af9a79d72e0a3312a7507b36d36e
+      size: 590322
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 0dde8ae5ec4265452fd34fd24fde7664
+      size: 2366160
+    - path: models/encoders.pkl
+      hash: md5
+      md5: b8c08264d1d256080cb53c66993cb347
+      size: 848
