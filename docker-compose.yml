@@ -1,0 +1,21 @@
+services:
+  clinvar-api:
+    build: .
+    container_name: clinvar_fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./monitoring:/app/monitoring
+    restart: unless-stopped
+
+  mlflow-ui:
+    build: .
+    container_name: clinvar_mlflow
+    command: mlflow ui --backend-store-uri sqlite:///mlflow.db --host 0.0.0.0 --port 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow.db:/app/mlflow.db
+      - ./mlruns:/app/mlruns
+    restart: unless-stopped
