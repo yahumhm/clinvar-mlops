@@ -1,0 +1,51 @@
+{
+    "timestamp": "2026-11-19T19:26:37.164280",
+    "reference_samples": 52150,
+    "production_samples": 13,
+    "features": {
+        "AF_ESP": {
+            "ref_mean": 0.0145,
+            "prod_mean": 0.0858,
+            "ks_statistic": 0.8262,
+            "p_value": 0.0,
+            "drift_detected": true
+        },
+        "AF_EXAC": {
+            "ref_mean": 0.0145,
+            "prod_mean": 0.394,
+            "ks_statistic": 0.8319,
+            "p_value": 0.0,
+            "drift_detected": true
+        },
+        "AF_TGP": {
+            "ref_mean": 0.0153,
+            "prod_mean": 0.0849,
+            "ks_statistic": 0.8278,
+            "p_value": 0.0,
+            "drift_detected": true
+        },
+        "CADD_PHRED": {
+            "ref_mean": 15.6434,
+            "prod_mean": 21.0038,
+            "ks_statistic": 0.5719,
+            "p_value": 0.0001,
+            "drift_detected": true
+        },
+        "CADD_RAW": {
+            "ref_mean": 2.5348,
+            "prod_mean": 2.87,
+            "ks_statistic": 0.4792,
+            "p_value": 0.0029,
+            "drift_detected": true
+        },
+        "LoFtool": {
+            "ref_mean": 0.3332,
+            "prod_mean": 0.2139,
+            "ks_statistic": 0.4918,
+            "p_value": 0.002,
+            "drift_detected": true
+        }
+    },
+    "overall_drift_detected": true,
+    "drifted_features_count": 6
+}

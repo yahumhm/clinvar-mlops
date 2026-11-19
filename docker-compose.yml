@@ -19,3 +19,18 @@ services:
       - ./mlflow.db:/app/mlflow.db
       - ./mlruns:/app/mlruns
     restart: unless-stopped
+
+  airflow:
+    image: apache/airflow:2.10.2
+    container_name: clinvar_airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - _PIP_ADDITIONAL_REQUIREMENTS=pandas numpy scikit-learn mlflow scipy joblib
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - .:/opt/airflow/project
+    ports:
+      - "8080:8080"
+    command: standalone
+    restart: unless-stopped
