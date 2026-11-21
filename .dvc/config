@@ -1,4 +1,6 @@
 [core]
-    remote = localremote
+    remote = s3remote
 ['remote "localremote"']
     url = ../../dvc_remote_storage
+['remote "s3remote"']
+    url = s3://clinvar-mlops-yahumhm-2026
